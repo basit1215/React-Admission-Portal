@@ -1,0 +1,32 @@
+.MuiIconButton-root[aria-label="Collapse navigation menu"] {
+    display: none;
+  }
+  
+  .MuiPaper-root.MuiDrawer-paper {
+    display: none !important;
+  }
+  
+  .css-1qsfemz {
+    display: none;
+  }
+  
+  .MuiPaper-elevation4{
+     background-color: #7480ff  !important;
+  }
+ 
+  .MuiTypography-root{
+    color: white !important;
+    margin-left:15px !important;
+  }
+
+
+  .MuiSvgIcon-root{
+    color: white !important;
+    font-size: 36px !important;
+    margin-right:15px !important; 
+  }
+
+  /* .MuiToolbar-root{
+ 
+  
+  } */
