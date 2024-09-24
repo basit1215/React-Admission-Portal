@@ -15,22 +15,42 @@ const VerifyAdmission = () => {
   return (
 
     <div>
-      <h1>Admission Verification</h1>
+      <h1 className='text-3xl text-center font-bold mt-5 mb-10'>Admission Verification</h1>
 
       <form onSubmit={handleSubmit(onSubmit)}>
+        <div>
+          <label>
+            <span className='text-sm mx-[110px] '>CNIC (Which you provided during form submission)</span>
+            <br />
+            <input type="text" placeholder='CNIC Number' className='w-[1140px] h-12 border border-gray-300  rounded-xl pl-5  mx-[105px] my-[5px]' {...register("cnicNumber", {
+              required: "CNIC is required",
+              pattern: {
+                value: /^[0-9]+$/,
+                message: "CNIC must contain only numbers"
+              },
+              minLength: {
+                value: 13,
+                message: "CNIC must be exactly 13 digits"
+              },
+              maxLength: {
+                value: 13,
+                message: "CNIC must be exactly 13 digits"
+              }
+            })} />
+          </label>
+          <br />
+          {errors.cnicNumber?.type === "required" && <span>{errors.cnicNumber.message}</span>}
+          {errors.cnicNumber?.type === "pattern" && <span>{errors.cnicNumber.message}</span>}
+          {errors.cnicNumber?.type === "minLength" && <span>{errors.cnicNumber.message}</span>}
+          {errors.cnicNumber?.type === "maxLength" && <span>{errors.cnicNumber.message}</span>}
+          <br />
 
-      <label >
-        CNIC (Which you provided during form submission)
-        <br />
-        <input type="number" placeholder='CNIC Number' {...register("cnicNumber", { required: true, min: 13, max: 13 })} />
-      </label>
-      <br />
-      {errors.cnicNumber && <span>This field is required</span>}
-      <br />
-
-      <input type="submit" />
+          <input className='w-[1140px]  h-12 border bg-[#4a00ff] text-white hover:bg-[#1a1f99] border-gray-300  rounded-xl text-center  mx-[105px] mb-[50px]' type="submit" />
+        </div>
       </form>
     </div>
+
+
   )
 }
 
