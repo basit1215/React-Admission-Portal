@@ -1,23 +1,69 @@
-import React from 'react'
-import { useForm } from "react-hook-form"
+import React, { useState } from 'react';
+import { useForm } from "react-hook-form";
+import { sendData, uploadImage } from '../config/firebase/firebasemethods';
 
 const Admission = () => {
 
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
-  } = useForm()
+  } = useForm();
 
-  const onSubmit = (data) => console.log(data);
+  const [userData, setUserData] = useState([]);
+
+  const sendDatatoFirestore = (data) => {
+    const file = data.profile[0];
+
+    uploadImage(file, data.email)
+      .then((url) => {
+
+        sendData({
+          name: data.fullName,
+          father: data.fatherName,
+          phoneNumber: data.phoneNumber,
+          email: data.email,
+          address: data.address,
+          gender: data.gender,
+          laptop: data.laptop,
+          cnic: data.cnicNumber,
+          qualification: data.qualification,
+          profileImg: url,
+          dateOfBirth: data.date
+        }, 'userData')
+          .then((res) => {
+            setUserData([...userData, {
+              name: data.fullName,
+              father: data.fatherName,
+              phoneNumber: data.phoneNumber,
+              email: data.email,
+              address: data.address,
+              gender: data.gender,
+              laptop: data.laptop,
+              cnic: data.cnicNumber,
+              qualification: data.qualification,
+              profileImg: url,
+              dateOfBirth: data.date
+            }]);
+            console.log(data);
+            console.log(res);
+          })
+          .catch((error) => {
+            console.error("Error saving data to Firestore:", error);
+          });
+
+      })
+      .catch((error) => {
+        console.error("Error uploading image:", error);
+      });
+  };
 
   return (
 
     <div>
       <h1 className='text-3xl text-center font-bold mt-5 mb-10'>Admission Form</h1>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(sendDatatoFirestore)}>
 
         <div className='flex flex-wrap mx-20  justify-center'>
 
@@ -28,7 +74,7 @@ const Admission = () => {
               <input className='w-[560px] h-12 border border-gray-300  rounded-xl pl-5  mx-3 my-[5px]' type="text" placeholder='Full Name' {...register("fullName", {
                 required: "Full Name is required",
                 pattern: {
-                  value: /^[A-Za-z]+$/i,
+                  value: /^[A-Za-z]+(?:\s[A-Za-z]+)*$/,
                   message: "Must contain only Letters"
                 },
                 minLength: {
@@ -42,10 +88,10 @@ const Admission = () => {
               })} />
             </label>
             <br />
-            {errors.fullName?.type === "required" && <span>{errors.fullName.message}</span>}
-            {errors.fullName?.type === "pattern" && <span>{errors.fullName.message}</span>}
-            {errors.fullName?.type === "minLength" && <span>{errors.fullName.message}</span>}
-            {errors.fullName?.type === "maxLength" && <span>{errors.fullName.message}</span>}
+            {errors.fullName?.type === "required" && <span className='text-red-600'>{errors.fullName.message }</span>}
+            {errors.fullName?.type === "pattern" && <span  className='text-red-600'>{errors.fullName.message}</span>}
+            {errors.fullName?.type === "minLength" && <span className='text-red-600'>{errors.fullName.message}</span>}
+            {errors.fullName?.type === "maxLength" && <span className='text-red-600 text-sm '>{errors.fullName.message}</span>}
             <br />
           </div>
 
@@ -56,7 +102,7 @@ const Admission = () => {
               <input className='w-[560px] h-12 border border-gray-300  rounded-xl pl-5  mx-3 my-[5px]' type="text" placeholder='Father Name'{...register("fatherName", {
                 required: "Father Name is required",
                 pattern: {
-                  value: /^[A-Za-z]+$/i,
+                  value: /^[A-Za-z]+(?:\s[A-Za-z]+)*$/,
                   message: "Must contain only Letters"
                 },
                 minLength: {
@@ -169,10 +215,10 @@ const Admission = () => {
             <label>
               <span className='text-sm mx-[18px] '>Gender</span>
               <br />
-              <select className='w-[560px] h-12 border border-gray-300  rounded-xl pl-5  mx-3 my-[5px] mb-8' {...register("gender")}>
-                <option disabled value="">Select an option</option>
+              <select defaultValue="male " className='w-[560px] h-12 border border-gray-300  rounded-xl pl-5  mx-3 my-[5px] mb-8' {...register("gender")}>
+                <option disabled >Select an option</option>
                 <option value="female">Female</option>
-                <option selected value="male">Male</option>
+                <option value="male">Male</option>
                 <option value="other">Other</option>
               </select>
             </label>
@@ -183,9 +229,9 @@ const Admission = () => {
             <label>
               <span className='text-sm mx-[18px] '>Do you have a Laptop?</span>
               <br />
-              <select className='w-[560px] h-12 border border-gray-300  rounded-xl pl-5  mx-3 my-[5px] mb-8' {...register("laptop")}>
-                <option disabled value="">Select an option</option>
-                <option selected value="yes">Yes</option>
+              <select defaultValue="yes" className='w-[560px] h-12 border border-gray-300  rounded-xl pl-5  mx-3 my-[5px] mb-8' {...register("laptop")}>
+                <option disabled >Select an option</option>
+                <option value="yes">Yes</option>
                 <option value="no">No</option>
               </select>
             </label>
@@ -205,9 +251,9 @@ const Admission = () => {
         <label >
           <span className='text-sm mx-[110px] '>Last Qualification</span>
           <br />
-          <select className='w-[1140px] h-12 border border-gray-300  rounded-xl pl-5  mx-[105px] my-[5px] mb-8' {...register("qualification")}>
-            <option disabled value="">Select an option</option>
-            <option selected value="matric">Matric</option>
+          <select defaultValue="matric" className='w-[1140px] h-12 border border-gray-300  rounded-xl pl-5  mx-[105px] my-[5px] mb-8' {...register("qualification")}>
+            <option disabled >Select an option</option>
+            <option value="matric">Matric</option>
             <option value="intermediate">Intermediate</option>
             <option value="bachelors">Bachelors</option>
             <option value="masters">Masters</option>
@@ -246,5 +292,3 @@ const Admission = () => {
 }
 
 export default Admission
-
-{/* <input type="file"  className=' w-[1140px] h-12 border border-gray-300  rounded-xl pl-5  mx-[105px] my-[5px]' {...register("profile", { required: true })} /> */ }
