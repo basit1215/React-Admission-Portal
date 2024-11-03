@@ -31,24 +31,21 @@ function Navbar(props) {
     };
   }, [pathname]);
 
-  // DOM manipulation to change text
   React.useEffect(() => {
     const element = document.querySelector('.MuiTypography-h6');
     if (element) {
-      element.textContent = 'Innovatrix Academy';
-    element.color = 'black'
+      element.textContent = 'Al-Basit Institute';
+      element.color = 'black'
     }
   }, []);
 
   return (
     <AppProvider router={router} theme={demoTheme}>
       <DashboardLayout>
-        {/* Collapse menu ko hide karna */}
         <div style={{ display: 'none' }}>
           <div aria-label="Collapse menu">
             <button>
               <svg>
-                {/* Collapse menu icon */}
               </svg>
             </button>
           </div>
