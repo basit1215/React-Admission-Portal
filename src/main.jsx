@@ -3,7 +3,6 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Layout from "./Layout";
 import './index.css'
 import Admission from "./Pages/Admission";
-import VerifyAdmission from "./Pages/VerifyAdmission";
 
  const router = createBrowserRouter([
     {
@@ -15,8 +14,8 @@ import VerifyAdmission from "./Pages/VerifyAdmission";
                 element: <Admission/>
             },
             {
-                path: "verify",
-                element: <VerifyAdmission/>
+                path: "*",
+                element: 'Page Not Found'
             }
         ]
         

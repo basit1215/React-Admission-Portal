@@ -1,64 +1,79 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { sendData, uploadImage } from "../config/firebase/firebasemethods";
+import Swal from 'sweetalert2';
 
 const Admission = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors }, reset
   } = useForm();
 
   const [userData, setUserData] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const sendDatatoFirestore = (data) => {
+  const sendDatatoFirestore = async (data) => {
+    setIsSubmitting(true);
     const file = data.profile[0];
 
-    uploadImage(file, data.email)
-      .then((url) => {
-        sendData(
-          {
-            name: data.fullName,
-            father: data.fatherName,
-            phoneNumber: data.phoneNumber,
-            email: data.email,
-            address: data.address,
-            gender: data.gender,
-            laptop: data.laptop,
-            cnic: data.cnicNumber,
-            qualification: data.qualification,
-            profileImg: url,
-            dateOfBirth: data.date,
-          },
-          "userData"
-        )
-          .then((res) => {
-            setUserData([
-              ...userData,
-              {
-                name: data.fullName,
-                father: data.fatherName,
-                phoneNumber: data.phoneNumber,
-                email: data.email,
-                address: data.address,
-                gender: data.gender,
-                laptop: data.laptop,
-                cnic: data.cnicNumber,
-                qualification: data.qualification,
-                profileImg: url,
-                dateOfBirth: data.date,
-              },
-            ]);
-            console.log(data);
-            console.log(res);
-          })
-          .catch((error) => {
-            console.error("Error saving data to Firestore:", error);
-          });
-      })
-      .catch((error) => {
-        console.error("Error uploading image:", error);
+    try {
+      const url = await uploadImage(file, data.email);
+      const res = await sendData(
+        {
+          name: data.fullName,
+          father: data.fatherName,
+          phoneNumber: data.phoneNumber,
+          email: data.email,
+          address: data.address,
+          gender: data.gender,
+          laptop: data.laptop,
+          cnic: data.cnicNumber,
+          qualification: data.qualification,
+          profileImg: url,
+          dateOfBirth: data.date,
+        },
+        "userData"
+      );
+
+      setUserData([
+        ...userData,
+        {
+          name: data.fullName,
+          father: data.fatherName,
+          phoneNumber: data.phoneNumber,
+          email: data.email,
+          address: data.address,
+          gender: data.gender,
+          laptop: data.laptop,
+          cnic: data.cnicNumber,
+          qualification: data.qualification,
+          profileImg: url,
+          dateOfBirth: data.date,
+        },
+      ]);
+      setIsSubmitting(false);
+
+      Swal.fire({
+        title: 'Thank you!',
+        text: 'Your form has been submitted successfully.',
+        icon: 'success',
+        confirmButtonText: 'OK'
+      }).then(() => {
+        console.log('THANK YOU')
+        reset();
       });
+
+    } catch (error) {
+      console.error("Error:", error);
+      setIsSubmitting(false);
+      Swal.fire({
+        title: 'Oops!',
+        text: 'Something went wrong. Please try again.',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
+    }
   };
 
   return (
@@ -67,11 +82,8 @@ const Admission = () => {
         Admission Form
       </h1>
 
-      <form
-        onSubmit={handleSubmit(sendDatatoFirestore)}
-        className="space-y-6 mb-10"
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <form onSubmit={handleSubmit(sendDatatoFirestore)} className="space-y-6 mb-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block">
               <span className="text-sm">Full Name</span>
@@ -320,7 +332,7 @@ const Admission = () => {
               {errors.profile.message}
             </span>
           )}
-          <ul class="list-disc pl-5 text-[#c2c2c2]">
+          <ul className="list-disc pl-5 mt-5 text-[#c2c2c2]">
             <li>With white or blue background</li>
             <li>File type: jpg, jpeg, png</li>
             <li>Upload your recent passport size picture</li>
@@ -330,9 +342,33 @@ const Admission = () => {
 
         <button
           type="submit"
-          className="w-full h-12 bg-blue-600 text-white rounded-xl mb-10  hover:bg-blue-500 transition duration-200 mt-6"
+          disabled={isSubmitting}
+          className="w-full h-12 bg-blue-600 text-white rounded-xl mb-10 hover:bg-blue-500 transition duration-200 mt-6 flex justify-center items-center"
         >
-          Submit
+          {isSubmitting ? (
+            <svg
+              className="animate-spin h-5 w-5 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+          ) : (
+            "Submit"
+          )}
         </button>
       </form>
     </div>
