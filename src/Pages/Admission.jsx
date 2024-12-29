@@ -332,7 +332,7 @@ const Admission = () => {
               {errors.profile.message}
             </span>
           )}
-          <ul className="list-disc pl-5 mt-5 text-[#c2c2c2]">
+          <ul className="list-disc pl-5 mt-5 ">
             <li>With white or blue background</li>
             <li>File type: jpg, jpeg, png</li>
             <li>Upload your recent passport size picture</li>
